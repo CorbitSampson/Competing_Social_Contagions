@@ -8,6 +8,7 @@ import time
 import matplotlib.pyplot as plt
 from CNO import CNO
 from simulation import simulation
+from opinion_generator import *
 ########## primary network ############
 #####################################################################################
 n = 1000                                              # network size
@@ -19,7 +20,7 @@ save_dict = {'network': False,
             'frac': True
             }
 gamma = 0.2                                          # recovery rate
-betabar = 0.274                                # infection rate
+betabar = 0.6                                # infection rate
 K = 0.1                                              # opinion shift rate
 opinions = [0 for x in range(1,n+1)]                 # generates initial opinion distribution
 #####################################################################################
@@ -45,12 +46,15 @@ simdict = {'network': H,
 
 ############### variable sweep ##############
 #####################################################################################
-print('Simulation for panel 1 has begun')
-M = 3 # number of simulations per point
+print('Simulation for panel 3 has begun')
+M = 2 # number of simulations per point
 epvec = np.linspace(0.001,10,35)
 xvec = np.linspace(-1,1,35)
 samplevec = np.linspace(0,0.05,M)
 sweepvar = np.zeros( (len(xvec), len(epvec)) )
+sp1 = np.zeros(M*M)
+sn1 = np.zeros(M*M)
+change_op = np.zeros(M*M)
 sp1 = np.zeros(M*M)
 sn1 = np.zeros(M*M)
 change_op = np.zeros(M*M)
@@ -69,13 +73,13 @@ for ep in epvec:
     i = 0
     for opinion in xvec:
         simdict['ep'] = ep
-        simdict['opinions'] = [opinion for x in range(1,n+1)]
+        simdict['opinions'] = normal_wrapped(opinion, 0.3, n)
         q = 0
         for q1 in range(M):
             for q2 in range(M):
                 simdict['update_size_p1'] = math.floor(n*samplevec[q1])
                 simdict['update_size_n1'] = math.floor(n*samplevec[q2])
-                sim = simulation(simdict, filename_ext = 'P1')
+                sim = simulation(simdict, filename_ext = 'P3')
                 sim.main('single_infection')
                 sp1[q] = sim.contagion_network.get_frac_state(1)
                 sn1[q] = sim.contagion_network.get_frac_state(-1)
@@ -100,16 +104,16 @@ for ep in epvec:
         i = i + 1
     j = j + 1
 
-titlestring = 'sim_stability_sweep_P1.txt'
+titlestring = 'het_sim_stability_sweep_P3.txt'
 np.savetxt(titlestring, sweepvar)
-print('Simulation for panel 1 has ended')
+print('Simulation for panel 3 has ended')
 print('Max change after 3000 time steps is:')
-#np.savetxt('max_change_0_P1.txt',change0max)
-#np.savetxt('max_change_p_P1.txt',changepmax)
-#np.savetxt('max_change_n_P1.txt',changenmax)
-#np.savetxt('avg_change_0_P1.txt',change0avg)
-#np.savetxt('avg_change_0_P1.txt',changepavg)
-#np.savetxt('avg_change_0_P1.txt',changenavg)
+#np.savetxt('max_change_0_P3_H.txt',change0max)
+#np.savetxt('max_change_p_P3_H.txt',changepmax)
+#np.savetxt('max_change_n_P3_H.txt',changenmax)
+#np.savetxt('avg_change_0_P3_H.txt',change0avg)
+#np.savetxt('avg_change_0_P3_H.txt',changepavg)
+#np.savetxt('avg_change_0_P3_H.txt',changenavg)
 print(np.max(np.max(change0max)))
 print(np.max(np.max(changepmax)))
 print(np.max(np.max(changenmax)))

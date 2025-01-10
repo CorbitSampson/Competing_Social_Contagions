@@ -1,0 +1,2 @@
+Start-Process -NoNewWindow Python Fig_11_hetero_opinions_bimodal_panel_1_data_generator.py
+Start-Process -NoNewWindow Python Fig_11_hetero_opinions_bimodal_panel_2_data_generator.py

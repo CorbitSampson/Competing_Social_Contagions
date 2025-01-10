@@ -1,0 +1,4 @@
+Start-Process -NoNewWindow python Fig_10_hetero_opinions_monomodal_panel_1_data_generator.py
+Start-Process -NoNewWindow python Fig_10_hetero_opinions_monomodal_panel_2_data_generator.py
+Start-Process -NoNewWindow python Fig_10_hetero_opinions_monomodal_panel_3_data_generator.py
+Start-Process -NoNewWindow python Fig_10_hetero_opinions_monomodal_panel_4_data_generator.py

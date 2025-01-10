@@ -40,7 +40,7 @@ simdict = {'network': H,
            'event_size':  math.ceil((4/15)*n),
            'save_dict': save_dict,
            'savefreq':  1,
-           'exittime':  1500}
+           'exittime':  3000}
 #####################################################################################
 
 ############### variable sweep ##############
@@ -53,6 +53,16 @@ samplevec = np.linspace(0,0.05,M)
 sweepvar = np.zeros( (len(xvec), len(epvec)) )
 sp1 = np.zeros(M*M)
 sn1 = np.zeros(M*M)
+change_op = np.zeros(M*M)
+change_sn1 = np.zeros(M*M)
+change_sp1 = np.zeros(M*M)
+change0max = np.zeros( (len(xvec), len(epvec)) )
+changepmax = np.zeros( (len(xvec), len(epvec)) )
+changenmax = np.zeros( (len(xvec), len(epvec)) )
+change0avg = np.zeros( (len(xvec), len(epvec)) )
+changepavg = np.zeros( (len(xvec), len(epvec)) )
+changenavg = np.zeros( (len(xvec), len(epvec)) )
+
 i = 0
 j = 0
 for ep in epvec:
@@ -65,10 +75,13 @@ for ep in epvec:
             for q2 in range(M):
                 simdict['update_size_p1'] = math.floor(n*samplevec[q1])
                 simdict['update_size_n1'] = math.floor(n*samplevec[q2])
-                sim = simulation(simdict)
+                sim = simulation(simdict, filename_ext = 'P2')
                 sim.main('single_infection')
                 sp1[q] = sim.contagion_network.get_frac_state(1)
                 sn1[q] = sim.contagion_network.get_frac_state(-1)
+                change_op[q] = np.abs(sim.avg_opinion[-1] - np.mean(sim.avg_opinion[-200:-1]))
+                change_sn1[q] = np.abs(sim.frac_sn1[-1] - np.mean(sim.frac_sn1[-200:-1]))
+                change_sp1[q] = np.abs(sim.frac_sp1[-1] - np.mean(sim.frac_sp1[-200:-1]))
                 q = q + 1
         if np.mean(sp1) > np.mean(sn1):
             sweepvar[i,j] = 1
@@ -76,10 +89,31 @@ for ep in epvec:
             sweepvar[i,j] = -1
         else:
             sweepvar[i,j] = 0
+        
+        change0max[i,j] = np.max(change_op)
+        changepmax[i,j] = np.max(change_sp1)
+        changenmax[i,j] = np.max(change_sn1)
+        change0avg[i,j] = np.mean(change_op)
+        changepavg[i,j] = np.mean(change_sp1)
+        changenavg[i,j] = np.mean(change_sn1)
+        
         i = i + 1
     j = j + 1
 
 titlestring = 'sim_stability_sweep_P2.txt'
 np.savetxt(titlestring, sweepvar)
 print('Simulation for panel 2 has ended')
+print('Max change after 3000 time steps is:')
+#np.savetxt('max_change_0_P2.txt',change0max)
+#np.savetxt('max_change_p_P2.txt',changepmax)
+#np.savetxt('max_change_n_P2.txt',changenmax)
+#np.savetxt('avg_change_0_P2.txt',change0avg)
+#np.savetxt('avg_change_0_P2.txt',changepavg)
+#np.savetxt('avg_change_0_P2.txt',changenavg)
+print(np.max(np.max(change0max)))
+print(np.max(np.max(changepmax)))
+print(np.max(np.max(changenmax)))
+print(np.mean(np.mean(change0avg)))
+print(np.mean(np.mean(changepavg)))
+print(np.mean(np.mean(changenavg)))
 #####################################################################################
